@@ -8,8 +8,9 @@ import java.util.Optional;
 
 @Mapper
 public interface IBookRepository {
-    @Insert("INSERT INTO books (title, author, year) VALUES (#{title}, #{author}, #{year})")
-    void insertBook(String title, String author, Integer year);
+    @Insert("INSERT INTO books (id, title, author, year) VALUES (BOOK_SEQ.NEXTVAL, #{title}, #{author}, #{year})")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+    void insertBook(Book book);
     @Update("UPDATE books SET title = #{title}, author = #{author}, year = #{year} WHERE id = #{id}")
     void updateBook(Long id, String title, String author, Integer year);
     @Select("SELECT * FROM books")

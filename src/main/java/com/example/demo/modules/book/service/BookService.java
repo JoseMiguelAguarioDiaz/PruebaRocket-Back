@@ -6,6 +6,7 @@ import com.example.demo.modules.book.controller.dto.SaveBookDto;
 import com.example.demo.modules.book.controller.dto.UpdateBookDto;
 import com.example.demo.modules.book.model.Book;
 import com.example.demo.modules.book.repository.IBookRepository;
+import com.example.demo.modules.inventory.respository.IInventoryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import java.util.Optional;
 @Transactional
 public class BookService {
     private final IBookRepository iBookRepository;
-
+    private final IInventoryRepository iInventoryRepository;
     @Transactional(rollbackFor = Exception.class)
     public ResponseApi<?> insertBook(SaveBookDto dto){
         try{
@@ -28,9 +29,16 @@ public class BookService {
 
             if (dto.getYear() < 0 || dto.getYear() > Year.now().getValue()) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.INVALID_FIELDS.name());
 
+            if(dto.getQuantity()<0) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.INVALID_FIELDS.name());
+
             if(iBookRepository.existsBookByTitleAndAuthor(dto.getTitle(), dto.getAuthor())) return new ResponseApi<>(HttpStatus.CONFLICT, ErrorMessages.ALREADY_EXISTS.name());
 
-            iBookRepository.insertBook(dto.getTitle(), dto.getAuthor(), dto.getYear());
+            Book book = new Book(dto.getTitle(),dto.getAuthor(),dto.getYear());
+            iBookRepository.insertBook(book);
+
+            System.out.println("id "+book.getId());
+            iInventoryRepository.insertInventory(book.getId(), dto.getQuantity());
+
             return new ResponseApi<>(HttpStatus.CREATED);
         }catch (Exception e){
             e.printStackTrace();
