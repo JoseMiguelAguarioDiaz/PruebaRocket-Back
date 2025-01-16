@@ -2,6 +2,7 @@ package com.example.demo.modules.book.repository;
 
 import com.example.demo.modules.book.model.Book;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.type.JdbcType;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,15 @@ public interface IBookRepository {
             ") THEN 1 ELSE 0 END " +
             "FROM dual")
     boolean existsBookByTitleAndAuthorExcludingId(@Param("title") String title, @Param("author") String author, @Param("id") Long id);
-    @Select("SELECT * FROM books WHERE id = #{id}")
-    Optional<Book> getOne(Long id);
+
+    @Select("SELECT CASE " +
+            "WHEN EXISTS (" +
+            "  SELECT 1 FROM books " +
+            "  WHERE id = #{id}" +
+            ") THEN 1 ELSE 0 END " +
+            "FROM dual")
+    boolean existsBookById(Long id);
+
+
 
 }

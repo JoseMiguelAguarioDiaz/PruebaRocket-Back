@@ -64,12 +64,15 @@ public class BookService {
 
             if (dto.getYear() < 0 || dto.getYear() > Year.now().getValue()) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.INVALID_FIELDS.name());
 
-            Optional<Book> optionalBook = iBookRepository.getOne(dto.getId());
-            if(optionalBook.isEmpty()) return new ResponseApi<>(HttpStatus.NOT_FOUND, ErrorMessages.NO_DATA_FOUND.name());
+            if(dto.getQuantity()<0) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.INVALID_FIELDS.name());
+
+
+            if(!iBookRepository.existsBookById(dto.getId())) return new ResponseApi<>(HttpStatus.NOT_FOUND, ErrorMessages.NO_DATA_FOUND.name());
 
             if(iBookRepository.existsBookByTitleAndAuthorExcludingId(dto.getTitle(), dto.getAuthor(), dto.getId())) return new ResponseApi<>(HttpStatus.CONFLICT, ErrorMessages.ALREADY_EXISTS.name());
 
             iBookRepository.updateBook(dto.getId(), dto.getTitle(), dto.getAuthor(), dto.getYear());
+            iInventoryRepository.updateInventory(dto.getId(), dto.getQuantity());
 
             return new ResponseApi<>(HttpStatus.OK);
         }catch (Exception e){
