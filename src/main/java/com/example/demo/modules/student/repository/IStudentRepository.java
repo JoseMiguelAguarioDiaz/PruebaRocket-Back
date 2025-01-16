@@ -20,5 +20,12 @@ public interface IStudentRepository {
     void insertStudent(String name, String email, String phone);
     @Select("SELECT id, fullname FROM students")
     List<GetStudentsListDto> getStudentsList();
+    @Select("SELECT CASE " +
+            "WHEN EXISTS (" +
+            "  SELECT 1 FROM students " +
+            "  WHERE id = #{id}" +
+            ") THEN 1 ELSE 0 END " +
+            "FROM dual")
+    boolean existsById(Long id);
 
 }
