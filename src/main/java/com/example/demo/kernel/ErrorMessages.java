@@ -9,4 +9,5 @@ public enum ErrorMessages {
     NO_DATA_FOUND,
     INVALID_EMAIL,
     NOT_ENOUGH_STOCK,
+    ALREADY_RETURNED,
 }

@@ -78,6 +78,8 @@ public class LoanService {
 
             Loan loan = iLoanRepository.getById(dto.getLoanId());
 
+            if(loan.isReturned()) return new ResponseApi<>(HttpStatus.CONFLICT, ErrorMessages.ALREADY_RETURNED.name());
+
             DisponibilityDto disponibilityDto = iInventoryRepository.getDisponibility(loan.getBookId());
 
             if(disponibilityDto == null) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.NO_DATA_FOUND.name());
