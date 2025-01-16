@@ -35,4 +35,14 @@ public class StudentService {
             return new ResponseApi<>(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR.name());
         }
     }
+    @Transactional(readOnly = true)
+    public ResponseApi<?> getStudentsList(){
+        try{
+            return new ResponseApi<>(iStudentRepository.getStudentsList(),HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseApi<>(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR.name());
+        }
+    }
+
 }

@@ -1,8 +1,11 @@
 package com.example.demo.modules.student.repository;
 
+import com.example.demo.modules.student.controller.dto.GetStudentsListDto;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface IStudentRepository {
@@ -15,4 +18,7 @@ public interface IStudentRepository {
     boolean existsByEmail(String email);
     @Insert("INSERT INTO students (fullname, email, phone) VALUES (#{name}, #{email}, #{phone})")
     void insertStudent(String name, String email, String phone);
+    @Select("SELECT id, fullname FROM students")
+    List<GetStudentsListDto> getStudentsList();
+
 }

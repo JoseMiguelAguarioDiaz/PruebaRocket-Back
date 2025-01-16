@@ -18,4 +18,9 @@ public class StudentController {
         ResponseApi<?> response = studentService.insertStudent(dto);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
+    @GetMapping("/get-list")
+    public ResponseEntity<ResponseApi<?>> getStudentsList(){
+        ResponseApi<?> response = studentService.getStudentsList();
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
 }
