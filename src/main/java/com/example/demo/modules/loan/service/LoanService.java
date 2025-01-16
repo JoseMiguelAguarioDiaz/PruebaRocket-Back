@@ -6,7 +6,9 @@ import com.example.demo.modules.book.repository.IBookRepository;
 import com.example.demo.modules.inventory.model.dto.DisponibilityDto;
 import com.example.demo.modules.inventory.respository.IInventoryRepository;
 import com.example.demo.modules.loan.controller.dto.GetLoansByBookIdDto;
+import com.example.demo.modules.loan.controller.dto.ReturnBookDto;
 import com.example.demo.modules.loan.controller.dto.SaveLoanDto;
+import com.example.demo.modules.loan.model.Loan;
 import com.example.demo.modules.loan.repository.ILoanRepository;
 import com.example.demo.modules.student.repository.IStudentRepository;
 import lombok.AllArgsConstructor;
@@ -61,6 +63,35 @@ public class LoanService {
 
 
             return new ResponseApi<>(iLoanRepository.getAllLoansByBookId(dto.getBookId()), HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseApi<>(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR.name());
+        }
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseApi<?> returnBook(ReturnBookDto dto){
+        try{
+            if(dto.getLoanId() == null) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.MISSING_FIELDS.name());
+            if(dto.getLoanId()<=0) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.INVALID_FIELDS.name());
+
+            if(!iLoanRepository.loanExistsById(dto.getLoanId())) return new ResponseApi<>(HttpStatus.NOT_FOUND, ErrorMessages.NO_DATA_FOUND.name());
+
+            Loan loan = iLoanRepository.getById(dto.getLoanId());
+
+            DisponibilityDto disponibilityDto = iInventoryRepository.getDisponibility(loan.getBookId());
+
+            if(disponibilityDto == null) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.NO_DATA_FOUND.name());
+            if(disponibilityDto.getAvailable() <= 0) return new ResponseApi<>(HttpStatus.CONFLICT, ErrorMessages.NOT_ENOUGH_STOCK.name());
+
+            disponibilityDto.setAvailable(disponibilityDto.getAvailable() + 1);
+            disponibilityDto.setLoaned(disponibilityDto.getLoaned() - 1);
+
+            iInventoryRepository.updateInventory(loan.getBookId(), disponibilityDto.getAvailable());
+            iInventoryRepository.updateLoaned(loan.getBookId(), disponibilityDto.getLoaned());
+
+            iLoanRepository.returnBook(dto.getLoanId());
+
+            return new ResponseApi<>(HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
             return new ResponseApi<>(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR.name());
