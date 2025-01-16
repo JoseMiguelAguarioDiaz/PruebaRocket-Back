@@ -6,5 +6,6 @@ public enum ErrorMessages {
     INVALID_FIELDS,
     INVALID_DATE,
     ALREADY_EXISTS,
-    NO_DATA_FOUND
+    NO_DATA_FOUND,
+    INVALID_EMAIL
 }
