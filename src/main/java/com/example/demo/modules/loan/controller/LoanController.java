@@ -1,6 +1,7 @@
 package com.example.demo.modules.loan.controller;
 
 import com.example.demo.kernel.ResponseApi;
+import com.example.demo.modules.loan.controller.dto.GetLoansByBookIdDto;
 import com.example.demo.modules.loan.controller.dto.SaveLoanDto;
 import com.example.demo.modules.loan.service.LoanService;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,12 @@ public class LoanController {
     @PostMapping("/")
     public ResponseEntity<ResponseApi<?>> insert (@RequestBody SaveLoanDto dto){
         ResponseApi<?> response = loanService.insertLoan(dto);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @PostMapping("/by-book")
+    public ResponseEntity<ResponseApi<?>> getLoansByBookId(@RequestBody GetLoansByBookIdDto dto){
+        ResponseApi<?> response = loanService.getAllLoans(dto);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 }

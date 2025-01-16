@@ -5,6 +5,7 @@ import com.example.demo.kernel.ResponseApi;
 import com.example.demo.modules.book.repository.IBookRepository;
 import com.example.demo.modules.inventory.model.dto.DisponibilityDto;
 import com.example.demo.modules.inventory.respository.IInventoryRepository;
+import com.example.demo.modules.loan.controller.dto.GetLoansByBookIdDto;
 import com.example.demo.modules.loan.controller.dto.SaveLoanDto;
 import com.example.demo.modules.loan.repository.ILoanRepository;
 import com.example.demo.modules.student.repository.IStudentRepository;
@@ -44,6 +45,22 @@ public class LoanService {
 
             iLoanRepository.insertLoan(dto.getStudentId(), dto.getBookId());
             return new ResponseApi<>(HttpStatus.OK, "Loan created successfully");
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseApi<>(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR.name());
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseApi<?> getAllLoans(GetLoansByBookIdDto dto){
+        try{
+            if(dto.getBookId() == null) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.MISSING_FIELDS.name());
+            if(dto.getBookId() <= 0) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.INVALID_FIELDS.name());
+
+            if(!iBookRepository.existsBookById(dto.getBookId())) return new ResponseApi<>(HttpStatus.BAD_REQUEST, ErrorMessages.NO_DATA_FOUND.name());
+
+
+            return new ResponseApi<>(iLoanRepository.getAllLoansByBookId(dto.getBookId()), HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
             return new ResponseApi<>(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR.name());
