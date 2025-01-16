@@ -5,5 +5,6 @@ public enum ErrorMessages {
     MISSING_FIELDS,
     INVALID_FIELDS,
     INVALID_DATE,
-    ALREADY_EXISTS
+    ALREADY_EXISTS,
+    NO_DATA_FOUND
 }
